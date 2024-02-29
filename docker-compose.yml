@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  fetchpublicapifunction:
+    image: ${DOCKER_REGISTRY-}fetchpublicapifunction
+    build:
+      context: .
+      dockerfile: FetchPublicApiFunction/Dockerfile
