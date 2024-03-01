@@ -10,11 +10,11 @@ using Newtonsoft.Json;
 
 namespace FetchPublicApiFunction
 {
-    public static class GetPayloadFunction
+    public static class GetLogFunction
     {
-        [FunctionName("GetPayloadFunction")]
+        [FunctionName("GetLogFunction")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "payload/{from:int?}/{to:int?}")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log")] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
