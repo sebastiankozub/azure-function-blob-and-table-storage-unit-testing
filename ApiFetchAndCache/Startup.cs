@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: FunctionsStartup(typeof(FetchPublicApiFunction.Startup))]
+[assembly: FunctionsStartup(typeof(ApiFetchAndCache.Startup))]
 
-namespace FetchPublicApiFunction;
+namespace ApiFetchAndCache;
 
 public class Startup : FunctionsStartup
 {

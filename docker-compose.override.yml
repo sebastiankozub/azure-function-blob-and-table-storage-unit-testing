@@ -1,6 +1,6 @@
 version: '3.4'
 
 services:
-  fetchpublicapifunction:
+  apifetchandcacheapp:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

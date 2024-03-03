@@ -1,22 +1,20 @@
 using System;
 using System.IO;
-using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Azure;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Client;
+using Azure;
+using Azure.Data.Tables;
 
-namespace FetchPublicApiFunction
+namespace ApiFetchAndCache
 {
     public class GetAndSaveFunction
     {
         private const string _connection = "AzureWebJobsStorage";
         private const string _publicEndpointUrl = @"https://api.publicapis.org/random?auth=null";
         private readonly HttpClient _client;
-
 
         public GetAndSaveFunction(IHttpClientFactory httpClientFactory)
         {
@@ -25,7 +23,7 @@ namespace FetchPublicApiFunction
 
         [FunctionName("GetAndSaveFunction")]
         [StorageAccount(_connection)]
-        [return: Table("responseTable")]
+        [return: Table("responseTable2")]
         public async Task<ApiResponse> RunAsync(
             [TimerTrigger("0 * * * * *")]TimerInfo myTimer,
             Binder binder,
@@ -96,12 +94,24 @@ namespace FetchPublicApiFunction
         }
     }
 
-    public class ApiResponse
+    public class ApiResponse : ITableEntity
     {
+        public ApiResponse()
+        {
+
+            PartitionKey = "publicApiResponse";
+        }
+
         public string Log { get; set; }
-        public string PartitionKey { get; set; } = "publicApiResponse";
-        public string RowKey { get; set; }
+
         public bool Success { get; set; }
+
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+
+        public ETag ETag { get; set; } = default!;
+        public DateTimeOffset? Timestamp { get; set; } = default!;
+
     }
 }
 

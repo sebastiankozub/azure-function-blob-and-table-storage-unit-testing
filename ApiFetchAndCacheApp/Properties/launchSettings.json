@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "ApiFetchAndCacheApp": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7118"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 31148,
+      "useSSL": false
+    }
+  }
+}

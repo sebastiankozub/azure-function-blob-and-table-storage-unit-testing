@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  fetchpublicapifunction:
-    image: ${DOCKER_REGISTRY-}apifetchandcache
+  apifetchandcacheapp:
+    image: ${DOCKER_REGISTRY-}apifetchandcacheapp
     build:
       context: .
-      dockerfile: ApiFetchAndCache/Dockerfile
+      dockerfile: ApiFetchAndCacheApp/Dockerfile

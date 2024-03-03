@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace FetchPublicApiFunction
+namespace ApiFetchAndCache
 {
     public static class GetLogFunction
     {
         [FunctionName("GetLogFunction")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/{from:DateTime?}")] HttpRequest req,
+            DateTime? from, 
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
