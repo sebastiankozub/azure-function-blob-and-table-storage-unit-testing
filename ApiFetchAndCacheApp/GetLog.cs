@@ -10,6 +10,12 @@ namespace ApiFetchAndCacheApp
     public class GetLog
     {
         private readonly ILogger _logger;
+        private const string _connection = "AzureWebJobsStorage";
+        private const string _publicEndpointUrl = @"https://api.publicapis.org/random?auth=null";
+        private const string _blobsContainer = @"my-blobs";
+
+
+
 
         public GetLog(ILoggerFactory loggerFactory)
         {
@@ -33,31 +39,30 @@ namespace ApiFetchAndCacheApp
 
             if (ticksTo != null)
             {
-                ticksToAsString = ticksTo.Value.ToString("d20");//.ToString().Replace(".", "").Replace(",", "");
+                ticksToAsString = ticksTo.Value.ToString("d20");
             }
             else
             {
-                ticksToAsString = DateTime.UtcNow.Ticks.ToString("d20");//.ToString().Replace(".", "").Replace(",", "");
+                ticksToAsString = DateTime.UtcNow.Ticks.ToString("d20");
             }
 
             //ticksFromString = ticksFrom == null ? "" : ticksFrom.ToString().Replace(".", "").Replace(",", "");
 
             if (ticksFrom != null )
             {
-                ticksFromAsString = ticksFrom.Value.ToString("d20");//.ToString().Replace(".", "").Replace(",", "");
+                ticksFromAsString = ticksFrom.Value.ToString("d20");
             }
             else
             {
-                ticksFromAsString = ((long)0).ToString("d20");//.ToString().Replace(".", "").Replace(",", "");
+                ticksFromAsString = ((long)0).ToString("d20");
             }
 
-            var results = await tableInputs.QueryAsync<ApiResponse>(filter: $"RowKey ge {ticksFromAsString} and RowKey le {ticksToAsString}").ToListAsync();
+            var results = await tableInputs.QueryAsync<ApiResponse>(filter: $"RowKey ge {ticksFromAsString} and RowKey le {ticksToAsString}").OrderByDescending(x => x.RowKey).ToListAsync();
                         
             var json = JsonSerializer.Serialize(results);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
+            response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             response.WriteString(json);
 
             return response;

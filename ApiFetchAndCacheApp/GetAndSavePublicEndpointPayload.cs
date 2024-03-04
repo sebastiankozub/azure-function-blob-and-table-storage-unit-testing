@@ -17,6 +17,7 @@ namespace ApiFetchAndCacheApp
         private readonly ILogger _logger;
         private const string _connection = "AzureWebJobsStorage";
         private const string _publicEndpointUrl = @"https://api.publicapis.org/random?auth=null";
+        private const string _blobsContainer = @"my-blobs";
         private readonly HttpClient _client;
 
         private readonly BlobContainerClient _blobContainerClient;
@@ -31,7 +32,7 @@ namespace ApiFetchAndCacheApp
 
         [Function("GetAndSavePublicEndpointPayload")]
         [TableOutput("responseTable2", Connection = _connection)]
-        public async Task<ApiResponse> Run([TimerTrigger("*/30 * * * * *")] MyInfo myTimer)
+        public async Task<ApiResponse> Run([TimerTrigger("*/20 * * * * *")] MyInfo myTimer)
         {
             _logger.LogInformation($"GetAndSaveFunction starts processing... : {DateTime.Now}");
 
@@ -85,6 +86,10 @@ namespace ApiFetchAndCacheApp
             {
                 BlobClient blobClient = _blobContainerClient.GetBlobClient(path);
                 await blobClient.UploadAsync(blobValue);
+
+                //blobClient = _blobContainerClient.GetBlobClient(path + "2"); //
+                //var r = await blobClient.DownloadContentAsync();
+                //var blobJson = r.Value.Content.ToString();
                 return true;
             }
             catch { return false; }
