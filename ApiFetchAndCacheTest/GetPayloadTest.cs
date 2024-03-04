@@ -36,7 +36,7 @@ public class GetPayloadTest
 
         var id = "003438743878734873487";
 
-        var byteArray = Encoding.ASCII.GetBytes("test");
+        var byteArray = Encoding.ASCII.GetBytes("test-content-finally-json-from-file");
         var binaryData = new BinaryData(byteArray);
         var bodyStream = new MemoryStream(byteArray);
 
@@ -100,8 +100,8 @@ public class GetPayloadTest
 
         var mockBlobClient = new Mock<BlobClient>();
         //mockBlobClient.Setup(m => m.DownloadContentAsync()).Returns(Task.FromResult(blobDownloadResultResponse)); //200
-        //mockBlobClient.Setup(m => m.DownloadContentAsync()).ThrowsAsync(new RequestFailedException(404, "RequestFailedException")); //404
-        mockBlobClient.Setup(m => m.DownloadContentAsync()).ThrowsAsync(new Exception("Exception")); //500
+        mockBlobClient.Setup(m => m.DownloadContentAsync()).ThrowsAsync(new RequestFailedException(404, "RequestFailedException")); //404
+        //mockBlobClient.Setup(m => m.DownloadContentAsync()).ThrowsAsync(new Exception("Exception")); //500
 
         mockBlobContainerClient.Setup(m => m.GetBlobClient(It.IsAny<string>())).Returns(mockBlobClient.Object);
         
@@ -116,7 +116,7 @@ public class GetPayloadTest
         var sut = new GetPayload(NullLoggerFactory.Instance, mockBlobClientFactory.Object);
         var result = sut.Run(req: mockHttpReq.Object, id: id);
         
-        Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.InternalServerError));
+        Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound), "NotFound");
     }
 
     //[Test]
