@@ -14,7 +14,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NotFoundResult = Microsoft.AspNetCore.Mvc.NotFoundResult;
+//using NotFoundResult = Microsoft.AspNetCore.Mvc.NotFoundResult;
 
 namespace ApiFetchAndCacheApp
 {
@@ -42,17 +42,16 @@ namespace ApiFetchAndCacheApp
 
             try
             {
-                var path = @$"3434343344343.json";
-                var path2 = @$"00638451090000732413.json";
+                var path = $"{id}.json";
 
                 var blobClient = _blobContainerClient.GetBlobClient(path);
                 var blobResponse = await blobClient.DownloadContentAsync();
 
-                var blobResponseJson = blobResponse.Value.Content.ToString();
+                var blobResponseBinaryData = blobResponse.Value.Content; //.ToString();
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-                response.WriteString(blobResponseJson);
+                await response.WriteAsJsonAsync(blobResponseBinaryData);
                 return response;
             }
             catch (RequestFailedException ex)
@@ -61,8 +60,7 @@ namespace ApiFetchAndCacheApp
                 {
                     
                     _logger.LogInformation($"Item {id} not found");
-                    return req.CreateResponse(HttpStatusCode.NotFound);
-                    
+                    return req.CreateResponse(HttpStatusCode.NotFound);                    
                 }
                 else 
                 {
