@@ -1,20 +1,11 @@
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Web.Http.Results;
 using Azure;
 using Azure.Core;
 using Azure.Storage.Blobs;
-using Google.Protobuf.WellKnownTypes;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-//using NotFoundResult = Microsoft.AspNetCore.Mvc.NotFoundResult;
 
 namespace ApiFetchAndCacheApp
 {
@@ -50,7 +41,6 @@ namespace ApiFetchAndCacheApp
                 var blobResponseBinaryData = blobResponse.Value.Content; //.ToString();
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "application/json; charset=utf-8");
                 await response.WriteAsJsonAsync(blobResponseBinaryData);
                 return response;
             }
