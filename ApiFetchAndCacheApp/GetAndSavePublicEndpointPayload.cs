@@ -8,26 +8,32 @@ using Microsoft.Azure.Functions.Worker.Extensions;
 using Microsoft.Azure.Functions;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Azure;
+using ApiFetchAndCacheApp.Options;
 
 
 namespace ApiFetchAndCacheApp
 {
     public class GetAndSavePublicEndpointPayload
-    {
-        private readonly ILogger _logger;
+    {        
         private const string _connection = "AzureWebJobsStorage";
-        private const string _publicEndpointUrl = @"https://api.publicapis.org/random?auth=null";
-        private const string _blobsContainer = @"my-blobs";
+
+        private readonly PublicApiOptions _publicApiOptions;
+        private readonly PayloadStorageOptions _payloadStorageOptions;
+        private readonly BlobContainerClient _blobContainerClient;
         private readonly HttpClient _client;
 
-        private readonly BlobContainerClient _blobContainerClient;
+        private readonly ILogger _logger;
 
-        public GetAndSavePublicEndpointPayload(ILoggerFactory loggerFactory, IHttpClientFactory _httpFactory, IAzureClientFactory<BlobServiceClient> blobClientFactory)
+        public GetAndSavePublicEndpointPayload(ILoggerFactory loggerFactory, IHttpClientFactory _httpFactory, IAzureClientFactory<BlobServiceClient> blobClientFactory, PublicApiOptions publicApiOptions, PayloadStorageOptions payloadStorageOptions)
         {
-            _logger = loggerFactory.CreateLogger<GetAndSavePublicEndpointPayload>();
+            _publicApiOptions = publicApiOptions;
+            _payloadStorageOptions = payloadStorageOptions;
+            
             _client = _httpFactory.CreateClient();
-            _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient("my-blobs");
+            _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient(_payloadStorageOptions.Container);
             _blobContainerClient.CreateIfNotExists();
+
+            _logger = loggerFactory.CreateLogger<GetAndSavePublicEndpointPayload>();
         }
 
         [Function("GetAndSavePublicEndpointPayload")]
@@ -42,7 +48,7 @@ namespace ApiFetchAndCacheApp
 
             try
             {
-                var response = await _client.GetAsync(_publicEndpointUrl);
+                var response = await _client.GetAsync(_publicApiOptions.RandomGetUri);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {

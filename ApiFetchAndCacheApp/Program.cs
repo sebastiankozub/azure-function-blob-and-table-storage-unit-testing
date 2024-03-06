@@ -1,7 +1,10 @@
+using ApiFetchAndCacheApp.Options;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -11,14 +14,36 @@ var host = new HostBuilder()
 
         services.AddAzureClients(clientBuilder =>
         {
-            clientBuilder.AddBlobServiceClient(host.Configuration.GetSection("AzureWebJobsStorage"))
+            var str = host.Configuration.GetSection("PayloadStorage:StorageConnectionString");
+
+            clientBuilder.AddBlobServiceClient(host.Configuration.GetSection("PayloadStorage:StorageConnectionString"))
                 .WithName("ApiFetchAndCache");
         });
+
+        services.AddOptions<PayloadStorageOptions>()
+            .Bind(host.Configuration.GetSection(PayloadStorageOptions.Section))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(resolver =>
+            resolver.GetRequiredService<IOptions<PayloadStorageOptions>>().Value);
+
+        services.AddOptions<PublicApiOptions>()
+            .Bind(host.Configuration.GetSection(PublicApiOptions.Section))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(resolver =>
+            resolver.GetRequiredService<IOptions<PublicApiOptions>>().Value);
+
+        services.AddOptions<LogStorageOptions>()
+            .Bind(host.Configuration.GetSection(LogStorageOptions.Section))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(resolver =>
+            resolver.GetRequiredService<IOptions<LogStorageOptions>>().Value);
     })
     .Build();
-
-
-
-
 
 host.Run();

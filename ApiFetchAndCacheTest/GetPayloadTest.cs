@@ -1,4 +1,5 @@
 using ApiFetchAndCacheApp;
+using ApiFetchAndCacheApp.Options;
 using Azure;
 using Azure.Core;
 using Azure.Core.Serialization;
@@ -113,7 +114,7 @@ public class GetPayloadTest
 
         var expected = new List<BlobItem>() { mockBlobItem1.Object, mockBlobItem2.Object, mockBlobItem3.Object };
 
-        var sut = new GetPayload(NullLoggerFactory.Instance, mockBlobClientFactory.Object);
+        var sut = new GetPayload(NullLoggerFactory.Instance, mockBlobClientFactory.Object, new PayloadStorageOptions(), new PublicApiOptions());
         var result = sut.Run(req: mockHttpReq.Object, id: id);
         
         Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound), "NotFound");

@@ -1,4 +1,5 @@
 using System.Net;
+using ApiFetchAndCacheApp.Options;
 using Azure;
 using Azure.Core;
 using Azure.Storage.Blobs;
@@ -12,14 +13,22 @@ namespace ApiFetchAndCacheApp
     public class GetPayload
     {
         private readonly ILogger _logger;
+
         private const string _connection = "AzureWebJobsStorage";
-        private const string _blobsContainer = @"my-blobs";
 
-        public GetPayload(ILoggerFactory loggerFactory, IAzureClientFactory<BlobServiceClient> blobClientFactory)
+        private readonly PayloadStorageOptions _payloadStorageOptions;
+        private readonly PublicApiOptions _publicApiOptions;
+
+        public GetPayload(ILoggerFactory loggerFactory, 
+            IAzureClientFactory<BlobServiceClient> blobClientFactory, 
+            PayloadStorageOptions payloadStorageOptions, 
+            PublicApiOptions publicApiOptions)
         {
-            _logger = loggerFactory.CreateLogger<GetLog>();
+            _logger = loggerFactory.CreateLogger<GetPayload>();
 
-            _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient("my-blobs");
+            _publicApiOptions = publicApiOptions;
+            _payloadStorageOptions = payloadStorageOptions;
+            _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient(_payloadStorageOptions.Container);
             _blobContainerClient.CreateIfNotExists();
         }
 
@@ -41,14 +50,13 @@ namespace ApiFetchAndCacheApp
                 var blobResponseBinaryData = blobResponse.Value.Content; //.ToString();
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(blobResponseBinaryData);
+                await response.WriteAsJsonAsync(new MemoryStream());
                 return response;
             }
             catch (RequestFailedException ex)
             {
                 if (ex.Status == 404)
-                {
-                    
+                {                    
                     _logger.LogInformation($"Item {id} not found");
                     return req.CreateResponse(HttpStatusCode.NotFound);                    
                 }

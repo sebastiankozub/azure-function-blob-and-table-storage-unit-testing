@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using ApiFetchAndCacheApp.Options;
 using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -9,24 +10,26 @@ namespace ApiFetchAndCacheApp
 {
     public class GetLog
     {
+        private readonly PublicApiOptions _publicApiOptions;
+        private readonly PayloadStorageOptions _payloadStorageOptions;
+
         private readonly ILogger _logger;
+
         private const string _connection = "AzureWebJobsStorage";
-        private const string _publicEndpointUrl = @"https://api.publicapis.org/random?auth=null";
-        private const string _blobsContainer = @"my-blobs";
-
-
-
-
-        public GetLog(ILoggerFactory loggerFactory)
+        
+        public GetLog(ILoggerFactory loggerFactory, PublicApiOptions publicApiOptions, PayloadStorageOptions payloadStorageOptions)
         {
             _logger = loggerFactory.CreateLogger<GetLog>();
+
+            _publicApiOptions = publicApiOptions;
+            _payloadStorageOptions = payloadStorageOptions;
         }
 
         [Function("GetLog")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/{from:DateTime?}/{to:DateTime?}")] HttpRequestData req,
             DateTime? from,
             DateTime? to,
-            [TableInput(tableName: "responseTable2", partitionKey: "publicApiResponse", Connection = "AzureWebJobsStorage")] TableClient tableInputs,
+            [TableInput(tableName: "responseTable2", partitionKey: "publicApiResponse", Connection = _connection)] TableClient tableInputs,
             FunctionContext context)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
