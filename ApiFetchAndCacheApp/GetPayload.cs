@@ -35,14 +35,14 @@ namespace ApiFetchAndCacheApp
         private readonly BlobContainerClient _blobContainerClient;
 
         [Function("GetPayload")]
-        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "payload/{id}")] HttpRequestData req, string id)
-                //[BlobInput("my-blobs" + "/{id}.json", Connection = "AzureWebJobsStorage")] string json, string id)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "payload/{payloadId}")] HttpRequestData req, string payloadId)
+        //[BlobInput("my-blobs" + "/{payloadId}.json", Connection = "AzureWebJobsStorage")] string json, string id)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             try
             {
-                var path = $"{id}.json";
+                var path = $"{payloadId}.json";
 
                 var blobClient = _blobContainerClient.GetBlobClient(path);
                 var blobResponse = await blobClient.DownloadContentAsync();
@@ -50,14 +50,14 @@ namespace ApiFetchAndCacheApp
                 var blobResponseBinaryData = blobResponse.Value.Content; //.ToString();
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(new MemoryStream());
+                await response.WriteAsJsonAsync(blobResponseBinaryData);
                 return response;
             }
             catch (RequestFailedException ex)
             {
                 if (ex.Status == 404)
                 {                    
-                    _logger.LogInformation($"Item {id} not found");
+                    _logger.LogInformation($"Item {payloadId} not found");
                     return req.CreateResponse(HttpStatusCode.NotFound);                    
                 }
                 else 

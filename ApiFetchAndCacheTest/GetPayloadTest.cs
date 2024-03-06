@@ -35,7 +35,7 @@ public class GetPayloadTest
         serviceCollection.AddOptions<WorkerOptions>().Configure(options => { options.Serializer = new JsonObjectSerializer(); });
         var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        var id = "003438743878734873487";
+        var payloadId = "003438743878734873487";
 
         var byteArray = Encoding.ASCII.GetBytes("test-content-finally-json-from-file");
         var binaryData = new BinaryData(byteArray);
@@ -115,7 +115,7 @@ public class GetPayloadTest
         var expected = new List<BlobItem>() { mockBlobItem1.Object, mockBlobItem2.Object, mockBlobItem3.Object };
 
         var sut = new GetPayload(NullLoggerFactory.Instance, mockBlobClientFactory.Object, new PayloadStorageOptions(), new PublicApiOptions());
-        var result = sut.Run(req: mockHttpReq.Object, id: id);
+        var result = sut.Run(req: mockHttpReq.Object, payloadId: payloadId);
         
         Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound), "NotFound");
     }
