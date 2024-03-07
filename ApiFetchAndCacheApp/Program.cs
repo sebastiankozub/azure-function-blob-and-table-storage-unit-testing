@@ -1,3 +1,4 @@
+using ApiFetchAndCacheApp;
 using ApiFetchAndCacheApp.Options;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,8 @@ var host = new HostBuilder()
                 .WithName("ApiFetchAndCache");
         });
 
+
+        //options
         services.AddOptions<PayloadStorageOptions>()
             .Bind(host.Configuration.GetSection(PayloadStorageOptions.Section))
             .ValidateDataAnnotations()
@@ -43,6 +46,10 @@ var host = new HostBuilder()
 
         services.AddSingleton(resolver =>
             resolver.GetRequiredService<IOptions<LogStorageOptions>>().Value);
+
+        //internal
+        services.AddScoped<IBlobRepository, BlobRepository>();
+
     })
     .Build();
 

@@ -8,7 +8,7 @@ namespace ApiFetchAndCacheApp.Options
         {
         }
 
-        public static string Section = "LogStorage";
+        public const string Section = "LogStorage";
 
         [Required(AllowEmptyStrings = false)]
         [MinLength(4)]

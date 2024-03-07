@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using ApiFetchAndCacheApp.Model;
 using ApiFetchAndCacheApp.Options;
 using Azure.Data.Tables;
 using Microsoft.Azure.Functions.Worker;
@@ -29,7 +30,7 @@ namespace ApiFetchAndCacheApp
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "log/{from:DateTime?}/{to:DateTime?}")] HttpRequestData req,
             DateTime? from,
             DateTime? to,
-            [TableInput(tableName: "responseTable2", partitionKey: "publicApiResponse", Connection = _connection)] TableClient tableInputs,
+            [TableInput(tableName: "responseTable2", partitionKey: "publicApiResponse", Connection = _connection)] TableClient tableInputs, // use injected service client similar to blob to get configuration from env/json
             FunctionContext context)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");

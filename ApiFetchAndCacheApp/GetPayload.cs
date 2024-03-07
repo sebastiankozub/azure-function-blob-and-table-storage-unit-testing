@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using ApiFetchAndCacheApp.Options;
 using Azure;
 using Azure.Core;
@@ -14,25 +15,30 @@ namespace ApiFetchAndCacheApp
     {
         private readonly ILogger _logger;
 
-        private const string _connection = "AzureWebJobsStorage";
+        //private const string _connection = "AzureWebJobsStorage";
 
-        private readonly PayloadStorageOptions _payloadStorageOptions;
-        private readonly PublicApiOptions _publicApiOptions;
+        //private readonly PayloadStorageOptions _payloadStorageOptions;
+        //private readonly PublicApiOptions _publicApiOptions;
 
-        public GetPayload(ILoggerFactory loggerFactory, 
-            IAzureClientFactory<BlobServiceClient> blobClientFactory, 
-            PayloadStorageOptions payloadStorageOptions, 
-            PublicApiOptions publicApiOptions)
+        private readonly IBlobRepository _blobRepository;
+        
+        public GetPayload(ILoggerFactory loggerFactory,
+            //IAzureClientFactory<BlobServiceClient> blobClientFactory, 
+            //PayloadStorageOptions payloadStorageOptions, 
+            //PublicApiOptions publicApiOptions,
+            IBlobRepository blobRepository)
         {
             _logger = loggerFactory.CreateLogger<GetPayload>();
 
-            _publicApiOptions = publicApiOptions;
-            _payloadStorageOptions = payloadStorageOptions;
-            _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient(_payloadStorageOptions.Container);
-            _blobContainerClient.CreateIfNotExists();
+            //_publicApiOptions = publicApiOptions;
+            //_payloadStorageOptions = payloadStorageOptions;
+            //_blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient(_payloadStorageOptions.Container);
+            //_blobContainerClient.CreateIfNotExists();
+
+            _blobRepository = blobRepository;
         }
 
-        private readonly BlobContainerClient _blobContainerClient;
+        //private readonly BlobContainerClient _blobContainerClient;
 
         [Function("GetPayload")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "payload/{payloadId}")] HttpRequestData req, string payloadId)
@@ -44,13 +50,12 @@ namespace ApiFetchAndCacheApp
             {
                 var path = $"{payloadId}.json";
 
-                var blobClient = _blobContainerClient.GetBlobClient(path);
-                var blobResponse = await blobClient.DownloadContentAsync();
-
-                var blobResponseBinaryData = blobResponse.Value.Content; //.ToString();
+                var blobContent = await _blobRepository.GetAsync(path); 
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                await response.WriteAsJsonAsync(blobResponseBinaryData);
+                response.Headers.Add("Content-Type", "application/json");
+                await response.WriteStringAsync(blobContent.ToString(), Encoding.UTF8);
+
                 return response;
             }
             catch (RequestFailedException ex)
@@ -66,9 +71,9 @@ namespace ApiFetchAndCacheApp
                     return req.CreateResponse(HttpStatusCode.InternalServerError);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogInformation($"Problem communicating underlying system");
+                _logger.LogInformation($"Problem undefined: {ex.Message}");
                 return req.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }

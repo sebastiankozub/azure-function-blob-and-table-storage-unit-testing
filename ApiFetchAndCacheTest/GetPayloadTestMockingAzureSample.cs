@@ -18,7 +18,7 @@ using System.Text;
 
 namespace ApiFetchAndCacheTest;
 
-public class GetPayloadTest
+public class GetPayloadTestMockingAzureSample
 {
 
     [SetUp]

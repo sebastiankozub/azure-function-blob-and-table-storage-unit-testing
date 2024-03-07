@@ -15,7 +15,7 @@ namespace ApiFetchAndCacheApp.Options
         {
         }
 
-        public static string Section = "PayloadStorage";
+        public const string Section = "PayloadStorage";
 
         [Required(AllowEmptyStrings = false)]
         [MinLength(4)]
@@ -23,6 +23,5 @@ namespace ApiFetchAndCacheApp.Options
 
         [Required(AllowEmptyStrings = false)]
         public string StorageConnectionString { get; set; } = String.Empty;
-
     }
 }

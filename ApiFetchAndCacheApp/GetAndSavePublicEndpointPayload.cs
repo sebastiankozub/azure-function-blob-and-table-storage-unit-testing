@@ -9,6 +9,8 @@ using Microsoft.Azure.Functions;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Azure;
 using ApiFetchAndCacheApp.Options;
+using Azure.Storage.Blobs.Models;
+using ApiFetchAndCacheApp.Model;
 
 
 namespace ApiFetchAndCacheApp
@@ -19,16 +21,24 @@ namespace ApiFetchAndCacheApp
 
         private readonly PublicApiOptions _publicApiOptions;
         private readonly PayloadStorageOptions _payloadStorageOptions;
+        private readonly LogStorageOptions _logStorageOptions;
+
         private readonly BlobContainerClient _blobContainerClient;
         private readonly HttpClient _client;
 
         private readonly ILogger _logger;
 
-        public GetAndSavePublicEndpointPayload(ILoggerFactory loggerFactory, IHttpClientFactory _httpFactory, IAzureClientFactory<BlobServiceClient> blobClientFactory, PublicApiOptions publicApiOptions, PayloadStorageOptions payloadStorageOptions)
+        public GetAndSavePublicEndpointPayload(ILoggerFactory loggerFactory, 
+            IHttpClientFactory _httpFactory, 
+            IAzureClientFactory<BlobServiceClient> blobClientFactory, 
+            PublicApiOptions publicApiOptions, 
+            PayloadStorageOptions payloadStorageOptions,
+            LogStorageOptions logStorageOptions)
         {
             _publicApiOptions = publicApiOptions;
             _payloadStorageOptions = payloadStorageOptions;
-            
+            _logStorageOptions = logStorageOptions;
+
             _client = _httpFactory.CreateClient();
             _blobContainerClient = blobClientFactory.CreateClient("ApiFetchAndCache").GetBlobContainerClient(_payloadStorageOptions.Container);
             _blobContainerClient.CreateIfNotExists();
@@ -37,7 +47,7 @@ namespace ApiFetchAndCacheApp
         }
 
         [Function("GetAndSavePublicEndpointPayload")]
-        [TableOutput("responseTable2", Connection = _connection)]
+        [TableOutput("responseTable2", Connection = _connection)] // use injected service client similar to blob to get configuration from env/json
         public async Task<ApiResponse> Run([TimerTrigger("*/20 * * * * *")] MyInfo myTimer)
         {
             _logger.LogInformation($"GetAndSaveFunction starts processing... : {DateTime.Now}");
@@ -56,13 +66,13 @@ namespace ApiFetchAndCacheApp
                     {
                         logMessage = $"Successfully downloaded and saved payload : {DateTime.Now}";
                         _logger.LogInformation(logMessage);
-                        return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = true };
+                        return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = true, PartitionKey = _logStorageOptions.PartitionKey };
                     }
                     else
                     {
                         logMessage = $"Successfully downloaded but NOT saved payload : {DateTime.Now}";
                         _logger.LogError(logMessage);
-                        return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false };
+                        return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false, PartitionKey = _logStorageOptions.PartitionKey };
                     }
                 }
                 else
@@ -70,7 +80,7 @@ namespace ApiFetchAndCacheApp
                     logMessage = $"Public API responded with {((int)response.StatusCode)} : {DateTime.Now}";
                     _logger.LogError(logMessage);
 
-                    return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false };
+                    return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false, PartitionKey = _logStorageOptions.PartitionKey };
                 }
             }
             catch (Exception ex)
@@ -80,7 +90,7 @@ namespace ApiFetchAndCacheApp
                     {ex.Message}";
                 _logger.LogError(logMessage);
 
-                return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false };
+                return new ApiResponse { Log = logMessage, RowKey = rowKey, Success = false, PartitionKey = _logStorageOptions.PartitionKey };
             }
         }
 
@@ -91,7 +101,7 @@ namespace ApiFetchAndCacheApp
             try
             {
                 BlobClient blobClient = _blobContainerClient.GetBlobClient(path);
-                await blobClient.UploadAsync(blobValue);
+                var response =  await blobClient.UploadAsync(blobValue);
 
                 //blobClient = _blobContainerClient.GetBlobClient(path + "2"); //
                 //var r = await blobClient.DownloadContentAsync();

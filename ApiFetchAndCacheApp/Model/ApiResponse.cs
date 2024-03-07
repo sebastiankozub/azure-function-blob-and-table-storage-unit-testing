@@ -6,16 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApiFetchAndCacheApp
+namespace ApiFetchAndCacheApp.Model
 {
     public class ApiResponse : ITableEntity
     {
-        public ApiResponse()
-        {
-
-            PartitionKey = "publicApiResponse";
-        }
-
         public string Log { get; set; }
 
         public bool Success { get; set; }
@@ -25,6 +19,5 @@ namespace ApiFetchAndCacheApp
 
         public ETag ETag { get; set; } = default!;
         public DateTimeOffset? Timestamp { get; set; } = default!;
-
     }
 }

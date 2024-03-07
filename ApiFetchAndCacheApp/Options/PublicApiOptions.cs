@@ -8,7 +8,7 @@ namespace ApiFetchAndCacheApp.Options
         {
         }
 
-        public static string Section = "PublicApi";
+        public const string Section = "PublicApi";
 
         [Required(AllowEmptyStrings = false)]
         [Url]
