@@ -120,8 +120,7 @@ public class GetPayloadTestMockingAzureSample
         var expected = new List<BlobItem>() { mockBlobItem1.Object, mockBlobItem2.Object, mockBlobItem3.Object };
 
         var mockBlobRepository = new Mock<IBlobRepository>();
-        mockBlobRepository.Setup(m => m.GetAsync(It.IsAny<string>())).ReturnsAsync(binaryData);
-
+        mockBlobRepository.Setup(m => m.GetAsync(It.IsAny<string>())).ReturnsAsync(bodyStream);
 
         var sut = new GetPayload(NullLoggerFactory.Instance,
             //mockBlobClientFactory.Object, 

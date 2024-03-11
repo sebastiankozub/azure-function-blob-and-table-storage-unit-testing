@@ -15,10 +15,12 @@ var host = new HostBuilder()
 
         services.AddAzureClients(clientBuilder =>
         {
-            var str = host.Configuration.GetSection("PayloadStorage:StorageConnectionString");
-
+            var str1 = host.Configuration.GetSection("PayloadStorage:StorageConnectionString");
             clientBuilder.AddBlobServiceClient(host.Configuration.GetSection("PayloadStorage:StorageConnectionString"))
                 .WithName("ApiFetchAndCache");
+
+            var str2 = host.Configuration.GetSection("LogStorage:StorageConnectionString");
+            clientBuilder.AddTableServiceClient(host.Configuration.GetSection("LogStorage:StorageConnectionString"));
         });
 
 

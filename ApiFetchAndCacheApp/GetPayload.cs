@@ -27,12 +27,11 @@ namespace ApiFetchAndCacheApp
             {
                 var path = $"{payloadId}.json";
 
-                var blobContent = await _blobRepository.GetAsync(path); 
+                var blobContent = await _blobRepository.GetAsync(path);
 
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "application/json");
-                await response.WriteStringAsync(blobContent.ToString(), Encoding.UTF8);
-
+                response.Headers.Add("Content-Type", "application/json; charset=utf-8");
+                response.Body = blobContent;
                 return response;
             }
             catch (RequestFailedException ex)

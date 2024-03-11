@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace ApiFetchAndCacheApp
 {
-    public  interface IBlobRepository
+    public interface IBlobRepository
     {
-        Task<BinaryData> GetAsync(string path);
-        Task<Response<BlobContentInfo>> CreateAsync(string path, string blobValue);
-        Task<Response<BlobContentInfo>> UpdateAsync(string path, string blobValue);
-        Task<Response<BlobContentInfo>> CreateOrUpdateAsync(string path, string blobValue);
+        Task<Stream> GetAsync(string path);
+        Task<Response<BlobContentInfo>> CreateAsync(string path, Stream blobValue);
+        Task<Response<BlobContentInfo>> UpdateAsync(string path, Stream blobValue);
+        Task<Response<BlobContentInfo>> CreateOrUpdateAsync(string path, Stream blobValue);
         Task<Response> DeleteAsync(string path);
     }
 
@@ -33,21 +33,21 @@ namespace ApiFetchAndCacheApp
             _payloadStorageOptions = payloadStorageOptions;
         }
 
-        public async Task<BinaryData> GetAsync(string path)
+        public async Task<Stream> GetAsync(string path)
         {
             var blobClient = _blobContainerClient.GetBlobClient(path);
-            var blobResponse = await blobClient.DownloadContentAsync();
+            var blobResponse = await blobClient.OpenReadAsync();//.DownloadContentAsync();   // use openreadasync() return stream for efficiency
 
-            return blobResponse.Value.Content;
+            return blobResponse; //.Value.Content;
         }
 
-        public Task<Response<BlobContentInfo>> CreateAsync(string path, string blobValue)
+        public Task<Response<BlobContentInfo>> CreateAsync(string path, Stream blobValue) // upload stream for efficiency
         {
             BlobClient blobClient = _blobContainerClient.GetBlobClient(path);
             return blobClient.UploadAsync(blobValue);
         }
 
-        public Task<Response<BlobContentInfo>> CreateOrUpdateAsync(string path, string blobValue)
+        public Task<Response<BlobContentInfo>> CreateOrUpdateAsync(string path, Stream blobValue)
         {
             BlobClient blobClient = _blobContainerClient.GetBlobClient(path);
             return blobClient.UploadAsync(blobValue, overwrite: true);
@@ -59,7 +59,7 @@ namespace ApiFetchAndCacheApp
             return blobClient.DeleteAsync();
         }
 
-        public Task<Response<BlobContentInfo>> UpdateAsync(string path, string blobValue)
+        public Task<Response<BlobContentInfo>> UpdateAsync(string path, Stream blobValue)
         {
             BlobClient blobClient = _blobContainerClient.GetBlobClient(path);
             return blobClient.UploadAsync(blobValue, overwrite: true);

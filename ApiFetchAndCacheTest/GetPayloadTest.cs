@@ -35,7 +35,7 @@ public class GetPayloadTest
         var payloadId = "123";
         var expectedBlobContent = "Your expected blob content";
 
-        _blobRepositoryMock.Setup(x => x.GetAsync($"{payloadId}.json")).ReturnsAsync(new BinaryData(Encoding.UTF8.GetBytes(expectedBlobContent)));
+        _blobRepositoryMock.Setup(x => x.GetAsync($"{payloadId}.json")).ReturnsAsync(new MemoryStream(Encoding.UTF8.GetBytes(expectedBlobContent)));
 
         var responseMock = new FakeHttpResponseData(_mockFunctionCtx.Object);
 
@@ -48,7 +48,7 @@ public class GetPayloadTest
         Assert.That(result, Is.Not.Null);
         Assert.That((int)result.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
 
-        result.Body.Seek(0, SeekOrigin.Begin);
+        //result.Body.Seek(0, SeekOrigin.Begin);
         using var reader = new StreamReader(result.Body, Encoding.UTF8);        
         var bodyString = await reader.ReadToEndAsync();        
         Assert.That(bodyString, Is.EqualTo(expectedBlobContent));
