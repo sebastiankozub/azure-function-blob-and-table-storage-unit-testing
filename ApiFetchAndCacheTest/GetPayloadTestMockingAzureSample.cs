@@ -18,6 +18,9 @@ using System.Text;
 
 namespace ApiFetchAndCacheTest;
 
+
+
+
 public class GetPayloadTestMockingAzureSample
 {
 
@@ -51,11 +54,13 @@ public class GetPayloadTestMockingAzureSample
         mockHttpReq.Setup(r => r.Body).Returns(bodyStream);
         mockHttpReq.Setup(r => r.CreateResponse()).Returns(() =>
         {
-            var response = new Mock<HttpResponseData>(mockFunctionCtx.Object);
-            response.SetupProperty(r => r.Headers, new HttpHeadersCollection());
-            response.SetupProperty(r => r.StatusCode);
-            response.SetupProperty(r => r.Body, new MemoryStream());
-            return response.Object;
+            var response = new FakeHttpResponseData(mockFunctionCtx.Object);
+            response.Headers = new HttpHeadersCollection();
+            response.StatusCode = HttpStatusCode.NotFound;
+            response.Body = new MemoryStream();
+            //response.Setup(x => x.WriteStringAsync(It.IsAny<string>(), Encoding.UTF8)).Callback(() => response.SetupProperty(p => p.Body, new MemoryStream(Encoding.UTF8.GetBytes("expected content")))).Returns(Task.CompletedTask);
+            //Encoding.UTF8.GetBytes("expected content").CopyTo(response.Body,0);
+            return response;
         });
 
         //mockHttpReq
@@ -114,14 +119,19 @@ public class GetPayloadTestMockingAzureSample
 
         var expected = new List<BlobItem>() { mockBlobItem1.Object, mockBlobItem2.Object, mockBlobItem3.Object };
 
-        var sut = new GetPayload(NullLoggerFactory.Instance, 
+        var mockBlobRepository = new Mock<IBlobRepository>();
+        mockBlobRepository.Setup(m => m.GetAsync(It.IsAny<string>())).ReturnsAsync(binaryData);
+
+
+        var sut = new GetPayload(NullLoggerFactory.Instance,
             //mockBlobClientFactory.Object, 
             //new PayloadStorageOptions(), 
             //new PublicApiOptions(), 
-            new Mock<IBlobRepository>().Object);
+            mockBlobRepository.Object);
+
         var result = sut.Run(req: mockHttpReq.Object, payloadId: payloadId);
         
-        Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound), "NotFound");
+        Assert.That((int)result.Result.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
     }
 
     //[Test]
