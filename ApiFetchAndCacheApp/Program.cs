@@ -5,10 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Opt = Microsoft.Extensions.Options;
+using Microsoft.Azure.Functions.Worker;
+
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
+    .ConfigureFunctionsWebApplication()
+    //.ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((host, services) =>
     {
         services.AddHttpClient();
@@ -31,7 +34,7 @@ var host = new HostBuilder()
             .ValidateOnStart();
 
         services.AddSingleton(resolver =>
-            resolver.GetRequiredService<IOptions<PayloadStorageOptions>>().Value);
+            resolver.GetRequiredService<Opt.IOptions<PayloadStorageOptions>>().Value);
 
         services.AddOptions<PublicApiOptions>()
             .Bind(host.Configuration.GetSection(PublicApiOptions.Section))
@@ -39,7 +42,7 @@ var host = new HostBuilder()
             .ValidateOnStart();
 
         services.AddSingleton(resolver =>
-            resolver.GetRequiredService<IOptions<PublicApiOptions>>().Value);
+            resolver.GetRequiredService<Opt.IOptions<PublicApiOptions>>().Value);
 
         services.AddOptions<LogStorageOptions>()
             .Bind(host.Configuration.GetSection(LogStorageOptions.Section))
@@ -47,7 +50,7 @@ var host = new HostBuilder()
             .ValidateOnStart();
 
         services.AddSingleton(resolver =>
-            resolver.GetRequiredService<IOptions<LogStorageOptions>>().Value);
+            resolver.GetRequiredService<Opt.IOptions<LogStorageOptions>>().Value);
 
         //internal
         services.AddScoped<IBlobRepository, BlobRepository>();
