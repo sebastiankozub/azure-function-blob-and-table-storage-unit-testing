@@ -120,6 +120,8 @@ public class YtVideoDownload
                 var message = $"{videoUrl}    --   Video & Sound  --   '{video.Title}'    --    has been downloaded --{rndNr}";
                 var bytes = Encoding.UTF8.GetBytes(message);
                 await queueClient.SendMessageAsync(Convert.ToBase64String(bytes));
+                await queueClient.SendMessageAsync(Convert.ToBase64String(bytes));
+                await queueClient.SendMessageAsync(Convert.ToBase64String(bytes));
 
                 // http
                 var response = req.CreateResponse(HttpStatusCode.OK);

@@ -35,7 +35,7 @@ namespace UtubeFunctionApp
         }
 
         [Function(nameof(Function1))]
-        public async Task Run([QueueTrigger("ut-download-finished", Connection = "StorageConnectionString")] QueueMessage msg)
+        public async Task Run([QueueTrigger("ut-download-finished", Connection = "AzuriteStorageConnection")] QueueMessage msg)
         {
             _logger.LogInformation($"C# Queue trigger function processed: {msg.MessageText}");
 
