@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AvManifestService } from '../../service/UtubeService';
+//import { CheckboxListComponent } from './checkbox-list/checkbox-list.component';
 
 export interface AvManifest {
   id: string;
@@ -14,37 +15,26 @@ export interface AvManifest {
 }
 
 // video-stream.ts
-export interface VideoStream {
-  url: string;
-  container: string;
-  size: string;
-  bitrate: string;
+export interface VideoStream extends  AvStream {  
   videoCodec: string;
   videoQuality: string;
   videoResolution: string;
 }
 
 // audio-stream.ts
-export interface AudioStream {
-  url: string;
-  container: string;
-  size: string;
-  bitrate: string;
+export interface AudioStream extends  AvStream {
   audioCodec: string;
   audioLanguage?: string; // Optional
   isAudioLanguageDefault?: boolean; // Optional
 }
 
-// interface AvManifest {
-//   id: string;
-//   title: string;
-//   url: string; // Generated dynamically
-//   uploadDate: Date; // Assuming you receive it in Date format
-//   description: string;
-//   //duration?: TimeSpan; // Optional property
-//   keywords: string[];
-// }
-
+export interface AvStream {
+  url: string;
+  container: string;
+  size: string;
+  bitrate: string;
+  uniqueId: string;
+}
 
 @Component({
   selector: 'file-quality-picker',
@@ -59,51 +49,58 @@ export class FileQualityPickerComponent {
   audioStreams: AudioStream[] = [];
   avManifest? : AvManifest;
 
-  selectedVStreams: string[] = [];
-  selectedAStreams: string[] = [];
+  videoStreamNames: string[] = [];
+  audioStreamNames: string[] = [];
 
-  //avManifests : AvManifest[] = [];
+  selectedVStreamNames: string[] = [];
+  selectedAStreamNames: string[] = [];
 
   private baseUrl: string = 'https://localhost:7101/api';
-
+  
   constructor(private utubeService: AvManifestService, private http: HttpClient) 
   {}
-
-
-  //constructor(private http: HttpClient) { }
-
-  // fetchManifests() {
-  //   if (!this.id) {
-  //     alert("Please enter an ID");
-  //     return;
-  //   }
-
-  //   this.utubeService.getData("AvManifest/" + this.id).subscribe(response => {
-  //     this.videoManifests = response; //.filter((manifest: { type: string; }) => manifest.type === 'video');
-  //     this.audioManifests = response; //.filter((manifest: { type: string; }) => manifest.type === 'audio');
-  //   });
-  // }
 
   fetchAvManifest() {
     this.http.get<AvManifest>(`${this.baseUrl}/AvManifest/${this.resourceId}`)
       .subscribe(manifest => {
         this.audioStreams = manifest.audioStreams;
         this.videoStreams = manifest.videoStreams;
+
+        this.audioStreamNames = this.audioStreams.map(s => 
+          s.audioCodec.replaceAll(' ', '') 
+          + s.bitrate.replaceAll(' ', '')
+          + s.size.replaceAll(' ', ''));
+        this.videoStreamNames = this.videoStreams.map(s => 
+          s.videoCodec.replaceAll(' ', '') 
+          + s.bitrate.replaceAll(' ', '')
+          + s.size.replaceAll(' ', ''));
+
         manifest.url = `https://www.youtube.com/watch?v=${manifest.id}`;
         
         this.avManifest = manifest;
       });
   }
 
+  onSelectedVStreamsChange(selectedItems: string[]) {
+    this.selectedVStreamNames = selectedItems;
+    console.log(selectedItems );
+    console.log(this.selectedVStreamNames );
+  }
+
+  onSelectedAStreamsChange(selectedItems: string[]) {
+    this.selectedAStreamNames = selectedItems;
+    console.log("onSelectedAStreamsChange");
+    console.log(selectedItems );
+    console.log(this.selectedAStreamNames );
+  }
+}
 
     // const apiUrl1 = `YOUR_API_ENDPOINT_1/${this.id}`; 
     // const apiUrl2 = `YOUR_API_ENDPOINT_2/${this.id}`;
 
-
     // //AvManifest/{avResourceId}
     // this.http.get<VideoManifest[]>(apiUrl1, {}).subscribe(data => this.videoManifests = data || []);
     // this.http.get<AudioManifest[]>(apiUrl2, {}).subscribe(data => this.audioManifests = data || []);
-
 
     // submitForm() {
     //   const data = {
@@ -128,25 +125,54 @@ export class FileQualityPickerComponent {
     //     }
     //   });
 
-  
 
-  onCheckboxChange(streamId: string, isChecked: boolean, streamsToUpdate: string[]) {
-    // if (!manifestTitle)
-    //   return;
-    if (isChecked) {
-      streamsToUpdate.push(streamId);
-    } else {
-      const index = streamsToUpdate.indexOf(streamId);
-      if (index > -1) {
-        streamsToUpdate.splice(index, 1);
-      }
-    }
+  // onCheckboxChange(streamId: string, isChecked: boolean, streamsToUpdate: string[]) {
+  //   // if (!manifestTitle)
+  //   //   return;
+  //   if (isChecked) {
+  //     streamsToUpdate.push(streamId);
+  //   } else {
+  //     const index = streamsToUpdate.indexOf(streamId);
+  //     if (index > -1) {
+  //       streamsToUpdate.splice(index, 1);
+  //     }
+  //   }
 
-    //if (streamsToUpdate === this.selectedVStreams) {
-      this.selectedVStreams = streamsToUpdate;
-    //} else if (streamsToUpdate === this.selectedAStreams) {
-      this.selectedAStreams = streamsToUpdate;
-    //}
-  }
+  //   //if (streamsToUpdate === this.selectedVStreams) {
+  //     this.selectedVStreamNames = streamsToUpdate;
+  //   //} else if (streamsToUpdate === this.selectedAStreams) {
+  //     this.selectedAStreamNames = streamsToUpdate;
+  //   //}
+  // }
 
-}
+  //constructor(private http: HttpClient) { }
+
+  // fetchManifests() {
+  //   if (!this.id) {
+  //     alert("Please enter an ID");
+  //     return;
+  //   }
+
+  //   this.utubeService.getData("AvManifest/" + this.id).subscribe(response => {
+  //     this.videoManifests = response; //.filter((manifest: { type: string; }) => manifest.type === 'video');
+  //     this.audioManifests = response; //.filter((manifest: { type: string; }) => manifest.type === 'audio');
+  //   });
+  // }
+
+
+
+// To minimize the load on your application, you might also consider creating a pipe.
+
+// The transform function would look like this:
+
+// @Pipe({
+//   name: 'join'
+// })
+// export class JoinPipe implements PipeTransform {
+//   transform(input:Array<any>, sep = ','): string {
+//     return input.join(sep);
+//   }
+// }
+// It could look something like this, as far as usage:
+
+// <p>{{ cardData.names|join:', ' }}</p>

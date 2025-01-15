@@ -56,6 +56,8 @@ namespace UtubeRest.ViewModel
 
         public required string VideoResolution { get; set; }
 
+        public required string UniqueId { get; set; }
+
         public override string ToString() => $"Video-only ({VideoQuality} | {Container})";
     }
 
@@ -74,6 +76,8 @@ namespace UtubeRest.ViewModel
         public required string? AudioLanguage { get; set; }
 
         public required string? IsAudioLanguageDefault { get; set; }
+
+        public required string UniqueId { get; set; }
 
         public override string ToString() => AudioLanguage is not null
                 ? $"Audio-only ({Container} | {AudioLanguage})"

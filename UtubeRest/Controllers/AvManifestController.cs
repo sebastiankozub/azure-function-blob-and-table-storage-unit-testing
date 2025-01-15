@@ -51,9 +51,6 @@ namespace UtubeRest.Controllers
 
             if (bestQuStream is null) ; // throw new Exception("No video stream found");
 
-
-
-
             return new AvManifest() {
                 Id = videoId,
                 Title = video.Title,
@@ -69,6 +66,7 @@ namespace UtubeRest.Controllers
                     AudioCodec = x.AudioCodec.ToString(),
                     AudioLanguage =x.AudioLanguage.ToString(),
                     IsAudioLanguageDefault = x.IsAudioLanguageDefault.ToString(),
+                    UniqueId = GetSha256HashFrom(x.Url),
                 }).ToList(),
                 VideoStreams = videoStreamInfos.Select(x => new VideoStream()
                 {
@@ -79,11 +77,13 @@ namespace UtubeRest.Controllers
                     VideoCodec = x.VideoCodec.ToString(),
                     VideoQuality = x.VideoQuality.ToString(),
                     VideoResolution = x.VideoResolution.ToString(),
-                }).ToList(),
-                //Duration = video.Duration,                
-            };
-            
+                    UniqueId = GetSha256HashFrom(x.Url),
+                }).ToList(),           
+            };            
         }
+
+        public static string GetSha256HashFrom(string text) =>
+            BitConverter.ToString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(text))).Replace("-", string.Empty);
 
         //// POST api/<AvManifestController>
         //[HttpPost]

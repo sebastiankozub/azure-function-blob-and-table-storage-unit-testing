@@ -4,48 +4,45 @@
 <input type="text" [(ngModel)]="resourceId" placeholder="Enter ID">
 <button (click)="fetchAvManifest()">Fetch Manifests</button>
 
-<h3>Manifests</h3>
-<h3>Manifests</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Select</th>
-      <th>Title</th>
-    </tr>
-  </thead>
-  <tbody>
+<h3>Streams</h3>
+
+<app-checkbox-list #checkboxList1
+  [items]="videoStreamNames" listTitle="My Video Q List"
+  (selectedItemsChange)="onSelectedVStreamsChange($event)">
+</app-checkbox-list>
+
+
+<app-checkbox-list #checkboxList2
+  [items]="audioStreamNames" listTitle="My Audio Quality List"
+  (selectedItemsChange)="onSelectedAStreamsChange($event)">
+</app-checkbox-list>
+
+<p>A Items in Parent: {{ selectedAStreamNames.join(' \<*> ') }}</p>
+<p>V Items in Parent: {{ selectedVStreamNames.join(' \<*> ') }}</p>
+
+
+<p>Selected A Items in Parent: {{ selectedAStreamNames.join(' \<*> ') }}</p>
+<p>Selected V Items in Parent: {{ selectedVStreamNames.join(' \<*> ') }}</p>
+
+<!-- 
     <tr *ngFor="let vStream of videoStreams let i = index">
       <td>
         <input type="checkbox" #videoCheckbox 
         [id]="'videoCheckbox' + i" 
         [checked]="selectedVStreams.includes(vStream.bitrate)" 
-        (change)="onCheckboxChange(vStream.bitrate, videoCheckbox.checked, selectedVStreams)">
+        (change)="onCheckboxChange(vStream.bitrate, videoCheckbox.checked, this.selectedVStreams)">
       </td>
       <td><label [for]="'videoCheckbox' + i">{{ vStream.bitrate }}</label></td>
     </tr>
-  </tbody>
-</table>
-
-<h3>Manifests List 2</h3>
-<table>
-  <thead>
-    <tr>
-      <th>Select</th>
-      <th>Title</th>
-    </tr>
-  </thead>
-  <tbody>
+ 
     <tr *ngFor="let aStream of audioStreams; let i = index">
       <td>
         <input type="checkbox"  #audioCheckbox 
         [id]="'audioCheckbox' + i" 
         [checked]="selectedAStreams.includes(aStream.bitrate)" 
-        (change)="onCheckboxChange(aStream.bitrate, audioCheckbox.checked, selectedAStreams)">
+        (change)="onCheckboxChange(aStream.bitrate, audioCheckbox.checked, this.selectedAStreams)">
       </td>
       <td><label [for]="'audioCheckbox' + i">{{ aStream.bitrate }}</label></td>
     </tr>
-  </tbody>
-</table>
+ -->
 
-<p>Selected Manifests 1: {{ selectedVStreams }} </p>
-<p>Selected Manifests 2: {{ selectedAStreams }} </p>

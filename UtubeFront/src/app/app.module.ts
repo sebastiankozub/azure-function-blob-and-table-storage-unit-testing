@@ -7,18 +7,21 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileQualityPickerComponent } from './file-quality-picker/file-quality-picker.component';
+import { CheckboxListComponent } from './file-quality-picker/checkbox-list/checkbox-list.component';
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    FileQualityPickerComponent
+    FileQualityPickerComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule, // Add FormsModule to imports
-    HttpClientModule
-  ],
+    HttpClientModule,
+    CheckboxListComponent
+],
   providers: [],
   bootstrap: [AppComponent]
 })
