@@ -4,6 +4,7 @@
 // checkbox-list.component.ts
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Import CommonModule
+import { AvStream } from '../file-quality-picker.component';
 
 @Component({
   imports: [CommonModule], 
@@ -12,18 +13,18 @@ import { CommonModule } from '@angular/common'; // Import CommonModule
   template: `
     <h2>{{ listTitle }}</h2>
     <ul>
-      <li *ngFor="let item of items; let i = index">
-        <input type="checkbox" [id]="getCheckboxId(i)" [checked]="isSelected(item)" (change)="onCheckboxChange(item, $event)" />
-        <label [for]="getCheckboxId(i)">{{ item }}</label>
+      <li *ngFor="let item of this.items; let i = index">
+        <input type="checkbox" [id]="getCheckboxId(item)" [checked]="isSelected(item.hashId)" (change)="onCheckboxChange(item.hashId, $event)" />
+        <label [for]="getCheckboxId(item)">{{ item.friendlyName }}</label>
       </li>
     </ul>
   `,
   styles: []
 })
-export class CheckboxListComponent implements OnInit, OnChanges{
-  @Input() items: string[] = []; 
+export class CheckboxListComponent implements OnInit {
+  @Input() items: AvStream[] = []; 
   @Input() listTitle: string = "Select Items";
-  selectedItems: string[] = []; 
+  selectedItemsHashIds: string[] = []; 
   @Output() selectedItemsChange = new EventEmitter<string[]>();
 
   ngOnInit(): void {
@@ -32,39 +33,40 @@ export class CheckboxListComponent implements OnInit, OnChanges{
       console.log("ngOnInit");
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-      //if (changes['items'] && changes['items'].currentValue) {
-        //this.selectedItems = this.selectedItems.filter(item => changes['items'].currentValue.includes(item));
+  // ngOnChanges(changes: SimpleChanges): void {
+  //     //if (changes['items'] && changes['items'].currentValue) {
+  //       //this.selectedItems = this.selectedItems.filter(item => changes['items'].currentValue.includes(item));
 
-        console.log("ngOnChanges");
-      //}
+  //       console.log("ngOnChanges");
+  //     //}
+  // }
+
+  getCheckboxId(item: AvStream): string {
+    //return `chb-${this.listTitle.replaceAll(' ', '') }-${index}`; 
+    return item.hashId;
   }
 
-  getCheckboxId(index: number): string {
-    return `chb-${this.listTitle.replaceAll(' ', '') }-${index}`; 
-  }
-
-  onCheckboxChange(item: string, event: Event) {
+  onCheckboxChange(itemHashId: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
 
     let newSelectedItems: string[];
 
     if (isChecked) {
-      newSelectedItems = [...this.selectedItems, item];
+      newSelectedItems = [...this.selectedItemsHashIds, itemHashId];
     } else {
-      newSelectedItems = this.selectedItems.filter(i => i !== item);
+      newSelectedItems = this.selectedItemsHashIds.filter(i => i != itemHashId);
     }
 
-    console.log("checkbox component newSelectedItems   " + newSelectedItems);
 
-    this.selectedItems = newSelectedItems;
+    this.selectedItemsHashIds = newSelectedItems;
     this.selectedItemsChange.emit(newSelectedItems);
 
-    console.log("checkbox component this.selectedItems   " + this.selectedItems);
-    console.log("checkbox component this.items   " + this.items);
+    console.log("checkbox component selected \nnewSelectedItems   \n" + newSelectedItems);
+    console.log("checkbox component selected \nthis.selectedItems   \n" + this.selectedItemsHashIds);
+    console.log("checkbox component all \nthis.items   \n" + this.items);
   }
 
-  isSelected(item: string): boolean {
-    return this.selectedItems.includes(item);
+  isSelected(HashId: string): boolean {
+    return this.selectedItemsHashIds.includes(HashId);
   }
 }

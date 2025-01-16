@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { FormsModule } from '@angular/forms'; 
-import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileQualityPickerComponent } from './file-quality-picker/file-quality-picker.component';
 import { CheckboxListComponent } from './file-quality-picker/checkbox-list/checkbox-list.component';
+import { HttpClientModule, provideHttpClient } from '@angular/common/http';
+
 
 
 @NgModule({
@@ -18,11 +19,13 @@ import { CheckboxListComponent } from './file-quality-picker/checkbox-list/check
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule, // Add FormsModule to imports
-    HttpClientModule,
+    FormsModule,
     CheckboxListComponent
 ],
-  providers: [],
+  providers: [
+  provideHttpClient()
+
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

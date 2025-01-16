@@ -8,7 +8,8 @@ describe('CheckboxListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [CheckboxListComponent]
+      //declarations: [CheckboxListComponent],
+      imports: [CheckboxListComponent]
     })
     .compileComponents();
 

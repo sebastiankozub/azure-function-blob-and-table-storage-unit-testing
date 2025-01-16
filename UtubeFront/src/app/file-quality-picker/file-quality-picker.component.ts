@@ -33,7 +33,8 @@ export interface AvStream {
   container: string;
   size: string;
   bitrate: string;
-  uniqueId: string;
+  hashId: string;
+  friendlyName: string;
 }
 
 @Component({
@@ -49,11 +50,11 @@ export class FileQualityPickerComponent {
   audioStreams: AudioStream[] = [];
   avManifest? : AvManifest;
 
-  videoStreamNames: string[] = [];
-  audioStreamNames: string[] = [];
+  videoStreamFriendlyNames: string[] = [];
+  audioStreamFriendlyNames: string[] = [];
 
-  selectedVStreamNames: string[] = [];
-  selectedAStreamNames: string[] = [];
+  selectedVideoStreamsHashIds: string[] = [];
+  selectedAudioStreamsHashIds: string[] = [];
 
   private baseUrl: string = 'https://localhost:7101/api';
   
@@ -66,14 +67,44 @@ export class FileQualityPickerComponent {
         this.audioStreams = manifest.audioStreams;
         this.videoStreams = manifest.videoStreams;
 
-        this.audioStreamNames = this.audioStreams.map(s => 
-          s.audioCodec.replaceAll(' ', '') 
+        this.audioStreams = this.audioStreams.map(s => 
+        { 
+          s = s; 
+          s.friendlyName = s.audioCodec.replaceAll(' ', '') 
+          + " \n "
           + s.bitrate.replaceAll(' ', '')
-          + s.size.replaceAll(' ', ''));
-        this.videoStreamNames = this.videoStreams.map(s => 
-          s.videoCodec.replaceAll(' ', '') 
+          + " \n "
+          + s.size.replaceAll(' ', '');
+          return s;
+        });
+
+        this.videoStreams = this.videoStreams.map(s => 
+        { 
+          s = s; 
+          s.friendlyName = s.videoCodec.replaceAll(' ', '') 
+          + " \n "
           + s.bitrate.replaceAll(' ', '')
-          + s.size.replaceAll(' ', ''));
+          + " \n "
+          + s.size.replaceAll(' ', '');
+          return s;
+        });
+ 
+        this.audioStreamFriendlyNames = this.audioStreams.map(s => s.friendlyName);
+          // s.audioCodec.replaceAll(' ', '') 
+          // + " | "
+          // + s.bitrate.replaceAll(' ', '')
+          // + " | "
+          // + s.size.replaceAll(' ', ''));
+
+        this.videoStreamFriendlyNames = this.videoStreams.map(s => s.friendlyName);
+          // s.videoCodec.replaceAll(' ', '') 
+          //           + " | "
+          // + s.bitrate.replaceAll(' ', '')
+          //           + " | "
+          // + s.size.replaceAll(' ', ''));
+
+        // this.selectedVideoStreamsHashIds = this.audioStreams.map(s => (s as AvStream).hashId);
+        // this.selectedAudioStreamsHashIds = this.videoStreams.map(s => (s as AvStream).hashId);
 
         manifest.url = `https://www.youtube.com/watch?v=${manifest.id}`;
         
@@ -81,17 +112,17 @@ export class FileQualityPickerComponent {
       });
   }
 
-  onSelectedVStreamsChange(selectedItems: string[]) {
-    this.selectedVStreamNames = selectedItems;
-    console.log(selectedItems );
-    console.log(this.selectedVStreamNames );
+  onSelectedVStreamsChange(selectedItemsHashIds: string[]) {
+    this.selectedVideoStreamsHashIds = selectedItemsHashIds;
+    console.log(selectedItemsHashIds );
+    console.log(this.selectedVideoStreamsHashIds );
   }
 
   onSelectedAStreamsChange(selectedItems: string[]) {
-    this.selectedAStreamNames = selectedItems;
+    this.selectedAudioStreamsHashIds = selectedItems;
     console.log("onSelectedAStreamsChange");
     console.log(selectedItems );
-    console.log(this.selectedAStreamNames );
+    console.log(this.selectedAudioStreamsHashIds );
   }
 }
 

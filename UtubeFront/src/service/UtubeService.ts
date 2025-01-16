@@ -16,18 +16,3 @@ export class AvManifestService {
   }
 }
 
-///GET
-////api/AvManifest/{avResourceId}
-
-// @@Injectable({
-//   providedIn: 'root'
-// })
-// export class ManifestService {
-//   private apiUrl = 'https://your-api-endpoint.com/api/manifests';
-
-//   constructor(private http: HttpClient) {}
-
-//   getManifests(): Observable<any[]> {
-//     return this.http.get<any[]>(this.apiUrl);
-//   }
-// }

@@ -66,7 +66,7 @@ namespace UtubeRest.Controllers
                     AudioCodec = x.AudioCodec.ToString(),
                     AudioLanguage =x.AudioLanguage.ToString(),
                     IsAudioLanguageDefault = x.IsAudioLanguageDefault.ToString(),
-                    UniqueId = GetSha256HashFrom(x.Url),
+                    HashId = GetSha256HashFrom(x.Url),
                 }).ToList(),
                 VideoStreams = videoStreamInfos.Select(x => new VideoStream()
                 {
@@ -77,7 +77,7 @@ namespace UtubeRest.Controllers
                     VideoCodec = x.VideoCodec.ToString(),
                     VideoQuality = x.VideoQuality.ToString(),
                     VideoResolution = x.VideoResolution.ToString(),
-                    UniqueId = GetSha256HashFrom(x.Url),
+                    HashId = GetSha256HashFrom(x.Url),
                 }).ToList(),           
             };            
         }
