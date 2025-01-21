@@ -36,7 +36,6 @@ export class CheckboxListComponent implements OnInit {
   // ngOnChanges(changes: SimpleChanges): void {
   //     //if (changes['items'] && changes['items'].currentValue) {
   //       //this.selectedItems = this.selectedItems.filter(item => changes['items'].currentValue.includes(item));
-
   //       console.log("ngOnChanges");
   //     //}
   // }
@@ -56,7 +55,6 @@ export class CheckboxListComponent implements OnInit {
     } else {
       newSelectedItems = this.selectedItemsHashIds.filter(i => i != itemHashId);
     }
-
 
     this.selectedItemsHashIds = newSelectedItems;
     this.selectedItemsChange.emit(newSelectedItems);

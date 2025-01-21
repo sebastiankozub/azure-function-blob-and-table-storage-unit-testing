@@ -37,7 +37,7 @@ namespace UtubeRest.Controllers
             var videoId = YoutubeExplode.Videos.VideoId.Parse(avResourceId);  // try to not throw internal exception
 
             var video = await youtube.Videos.GetAsync(videoId);
-            var streams = youtube.Videos.Streams;
+            //var streams = youtube.Videos.Streams;
 
             var manifest = await youtube.Videos.Streams.GetManifestAsync(videoId);
 

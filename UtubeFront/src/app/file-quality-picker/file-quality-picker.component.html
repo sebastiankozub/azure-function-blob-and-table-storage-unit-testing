@@ -7,41 +7,23 @@
 <h3>Streams</h3>
 
 <app-checkbox-list #checkboxList1
-  [items]="videoStreams" listTitle="My Video Q List"
+  [items]="videoStreams" listTitle="Video Streams by Quality"
   (selectedItemsChange)="onSelectedVStreamsChange($event)">
 </app-checkbox-list>
 
-
 <app-checkbox-list #checkboxList2
-  [items]="audioStreams" listTitle="My Audio Quality List"
+  [items]="audioStreams" listTitle="Audio Streams by Quality"
   (selectedItemsChange)="onSelectedAStreamsChange($event)">
 </app-checkbox-list>
 
-<p>A Items in Parent: {{ selectedAudioStreamsHashIds.join(' \n ') + "\n------------------------------------------------"}}</p>
-<p>V Items in Parent: {{ selectedVideoStreamsHashIds.join(' \n ') + "\n------------------------------------------------"}}</p>
+<p>A Items in Parent: {{ selectedAudioStreamsHashIds.join(' \n ') + "\<br />------------------------------------------------"}}</p>
+<p>V Items in Parent: {{ selectedVideoStreamsHashIds.join(' \n ') + "\<br />------------------------------------------------"}}</p>
 
-<p>All audio Items in Parent: {{ audioStreamFriendlyNames.join(' \n ') }}</p>
-<p>All video Items in Parent: {{ videoStreamFriendlyNames.join(' \n ') }}</p>
+<button (click)="downloadStreams()">Start Downloads</button>
+<div *ngIf="downloading">Downloading...</div>
+<div *ngIf="downloadInitSuccess">Downloading initilized</div>
+<div *ngIf="downloadError">{{ downloadError }}</div>
+<div *ngIf="downloadComplete">Downloads Complete</div>
 
-<!-- 
-    <tr *ngFor="let vStream of videoStreams let i = index">
-      <td>
-        <input type="checkbox" #videoCheckbox 
-        [id]="'videoCheckbox' + i" 
-        [checked]="selectedVStreams.includes(vStream.bitrate)" 
-        (change)="onCheckboxChange(vStream.bitrate, videoCheckbox.checked, this.selectedVStreams)">
-      </td>
-      <td><label [for]="'videoCheckbox' + i">{{ vStream.bitrate }}</label></td>
-    </tr>
- 
-    <tr *ngFor="let aStream of audioStreams; let i = index">
-      <td>
-        <input type="checkbox"  #audioCheckbox 
-        [id]="'audioCheckbox' + i" 
-        [checked]="selectedAStreams.includes(aStream.bitrate)" 
-        (change)="onCheckboxChange(aStream.bitrate, audioCheckbox.checked, this.selectedAStreams)">
-      </td>
-      <td><label [for]="'audioCheckbox' + i">{{ aStream.bitrate }}</label></td>
-    </tr>
- -->
-
+<p>All audio Items in Parent: {{ audioStreamFriendlyNames.join('\<br />') }}</p>
+<p>All video Items in Parent: {{ videoStreamFriendlyNames.join('\<br />') }}</p>

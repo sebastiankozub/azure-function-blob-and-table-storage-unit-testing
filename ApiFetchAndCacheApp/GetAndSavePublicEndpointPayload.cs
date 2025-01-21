@@ -48,7 +48,7 @@ public class GetAndSavePublicEndpointPayload
 
     [Function("GetAndSavePublicEndpointPayload")]
     [TableOutput("responseTable2", Connection = _connection)] // use injected service client similar to blob to get configuration from env/json
-    public async Task<ApiResponse> Run([TimerTrigger("* 0/10 * * * *")] MyInfo myTimer)
+    public async Task<ApiResponse> Run([TimerTrigger("* 0/30 * * * *")] MyInfo myTimer)
     {
         _logger.LogInformation($"GetAndSaveFunction starts processing... : {DateTime.Now}");
 
